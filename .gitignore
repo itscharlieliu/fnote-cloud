@@ -1,2 +1,5 @@
+# JetBrains
 .idea/
+__pycache__/
+
 venv/
