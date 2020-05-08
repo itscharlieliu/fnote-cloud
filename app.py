@@ -1,4 +1,6 @@
 import json
+import string
+import random
 
 from flask import Flask, request
 from flask_restful import Api, Resource
@@ -34,7 +36,7 @@ class Container(Resource):
 
         notes = Notes.query.all()
 
-        if len(notes) <= 0:
+        if len(notes) <= 0 or not note_id:
             return ""
 
         for note in range(len(notes)):
@@ -44,16 +46,18 @@ class Container(Resource):
 
         return str(notes[0])
 
-    def post(self, note_id):
+    def post(self):
         user_input = request.get_json()
-        print(user_input)
-        note = Notes(id=user_input, note=user_input)
+
+        note_id = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
+
+        note = Notes(id=note_id, note=user_input)
         db.session.add(note)
         db.session.commit()
         return "", 201
 
 
-api.add_resource(Container, '/<int:note_id>')
+api.add_resource(Container, '/', '/<int:note_id>')
 
 if __name__ == '__main__':
     app.run()
