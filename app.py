@@ -32,8 +32,7 @@ db.create_all()
 
 
 class Container(Resource):
-    def get(self, note_id):
-
+    def get(self, note_id=None):
         notes = Notes.query.all()
 
         if len(notes) <= 0 or not note_id:
@@ -41,8 +40,6 @@ class Container(Resource):
 
         for note in range(len(notes)):
             print("{} {}".format(notes[note].get_id(), notes[note]))
-
-        print(notes[0])
 
         return str(notes[0])
 
