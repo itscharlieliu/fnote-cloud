@@ -13,14 +13,17 @@ db = SQLAlchemy(app)
 
 
 class Notes(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(6), primary_key=True)
     note = db.Column(db.String(500))
 
+    def get_id(self):
+        return str(self.id)
+
     def __repr__(self):
-        return self.note.__str__()
+        return str(self.note)
 
     def __str__(self):
-        return self.note.__str__()
+        return str(self.note)
 
 
 db.create_all()
@@ -28,22 +31,23 @@ db.create_all()
 
 class Container(Resource):
     def get(self, note_id):
-        # user_input = json.loads(request.get_json())
 
         notes = Notes.query.all()
 
+        if len(notes) <= 0:
+            return ""
+
         for note in range(len(notes)):
-            print(notes[note])
+            print("{} {}".format(notes[note].get_id(), notes[note]))
 
         print(notes[0])
 
-        return {"result": str(notes[0])}
+        return str(notes[0])
 
-    def post(self):
+    def post(self, note_id):
         user_input = request.get_json()
-        if 'note' not in user_input.keys():
-            return "JSON must contain key 'note'", 400
-        note = Notes(note=user_input['note'])
+        print(user_input)
+        note = Notes(id=user_input, note=user_input)
         db.session.add(note)
         db.session.commit()
         return "", 201
