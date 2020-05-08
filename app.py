@@ -33,28 +33,31 @@ db.create_all()
 
 class Container(Resource):
     def get(self, note_id=None):
-        notes = Notes.query.all()
+        if not note_id:
+            return "Must provide note_id", 404
 
-        if len(notes) <= 0 or not note_id:
-            return ""
+        note = Notes.query.filter_by(id=note_id).first()
 
-        for note in range(len(notes)):
-            print("{} {}".format(notes[note].get_id(), notes[note]))
+        if not note:
+            return "Note does not exist", 404
 
-        return str(notes[0])
+        return str(note)
 
-    def post(self):
+    def post(self, note_id=None):
+        if note_id:
+            pass
+
         user_input = request.get_json()
+        # TODO add collision detection
+        id = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
 
-        note_id = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
-
-        note = Notes(id=note_id, note=user_input)
+        note = Notes(id=id, note=user_input)
         db.session.add(note)
         db.session.commit()
-        return "", 201
+        return id, 201
 
 
-api.add_resource(Container, '/', '/<int:note_id>')
+api.add_resource(Container, '/', '/<note_id>')
 
 if __name__ == '__main__':
     app.run()
