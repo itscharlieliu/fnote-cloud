@@ -22,7 +22,7 @@ class Notes(db.Model):
         return str(self.id)
 
     def __repr__(self):
-        return str(self.note)
+        return {"id": str(self.id), "note": str(self.note)}
 
     def __str__(self):
         return str(self.note)
@@ -34,6 +34,9 @@ db.create_all()
 class Container(Resource):
     def get(self, note_id=None):
         if not note_id:
+            notes = Notes.query.all()
+            for note in notes:
+                print(note.__repr__())
             return "Must provide note_id", 404
 
         note = Notes.query.filter_by(id=note_id).first()
@@ -48,12 +51,16 @@ class Container(Resource):
             pass
 
         user_input = request.get_json()
-        # TODO add collision detection
-        id = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
+        while True:
+            try:
+                id = ''.join(random.choice(string.ascii_uppercase) for _ in range(6))
 
-        note = Notes(id=id, note=user_input)
-        db.session.add(note)
-        db.session.commit()
+                note = Notes(id=id, note=user_input)
+                db.session.add(note)
+                db.session.commit()
+                break
+            except Exception as e:
+                print(e)
         return id, 201
 
 
